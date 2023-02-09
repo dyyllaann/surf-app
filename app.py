@@ -1,15 +1,9 @@
-from urllib.request import urlopen
 from bs4 import BeautifulSoup
+from urllib.request import urlopen
 import time
 import schedule
 import smtplib
 import requests
-
-# Get data from NDBC
-url = 'https://www.ndbc.noaa.gov/data/realtime2/46267.txt'
-r = requests.get(url)
-data = r.text
-print(data)
 
 # Declare text carriers
 carriers = {
@@ -20,22 +14,17 @@ carriers = {
     'googlefi': '@msg.fi.google.com'
 }
 
-# Create Buoy object
 class Buoy:
-    id = 46088
-    checkTime = time.localtime(time.time())
+    swellData = []
+    windWaveData = []
+    formatted = None
 
-    # Wave attributes
-    WVHT = None
-    APD = None
-    MWD = None
-    GST = None
-
-    def tos():
-        return (str(Buoy.WVHT) + "\n" +
-        str(Buoy.APD) + "\n" +
-        str(Buoy.MWD)
-        )
+# Get latest data from NDBC using requests library
+def getLatestDataFromRequests():
+    url = 'https://www.ndbc.noaa.gov/data/latest_obs/46267.txt'
+    r = requests.get(url)
+    data = r.text
+    return data
 
 # Create message function
 def send(message):
@@ -43,7 +32,7 @@ def send(message):
     to_number = '3603019197{}'.format(carriers['googlefi'])
 
     # Gmail account and password
-    auth = ('straitsurf@gmail.com', 'LibTech1')
+    auth = ('straitsurf@gmail.com', 'ubxdboegmwesflzg')
 
 	# Establish a secure session with gmail's outgoing SMTP server using your gmail account
     server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -53,60 +42,28 @@ def send(message):
 	# Send text message through SMS gateway of destination number
     server.sendmail(auth[0], to_number, message)
 
-# Text formatting for terminal
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+def populateBuoy():
+    data = getLatestDataFromRequests()
+    Buoy.formatted = data.replace('°', ' deg')
+    array = Buoy.formatted.split('\n')
 
-# fetch data
-url = "https://www.ndbc.noaa.gov/station_page.php?station=46088"
-page = urlopen(url)
+    for i in range(13, 16):
+        subArray = array[i].split(' ')
+        Buoy.swellData.append(subArray)
 
-# declare soup
-soup = BeautifulSoup(page, 'html.parser')
+    for i in range(16, 19):
+        subArray = array[i].split(' ')
+        Buoy.windWaveData.append(subArray)
 
-# locate "data" id
-data = soup.find("div", {"id": "data"})
+def checkSwell():
+    populateBuoy()
+    if float(Buoy.swellData[0][1]) > 0.5:
+        send("SURF ALERT\n" + Buoy.formatted)
+        print("Surf alert sent")
 
-# find first table in data
-table = data.find("table")
-rows = table.findAll("tr")
+checkSwell()
 
-# iterate through relevent children and print results
-print("")
-rowIndex = 1
-while rowIndex < len(rows):
-    item = rows[rowIndex].findAll("td")
-    keywords = ['WVHT', 'APD', 'MWD']
-    
-    # If length is greater than 2, it contains a key-value pair
-    if len(item) > 2:
-        key = item[1].string
-        value = item[2].string
+# schedule.every(30).minutes.do(checkSwell)
 
-        # print(key, value)
-
-        # # Almost works...
-        # while i < len(keywords):
-        #     if keywords[i] in key:
-        #         setattr(Buoy, keywords[i], (key + value))
-        #         print(bcolors.OKGREEN + key, value + bcolors.ENDC)
-        #     else:
-        #         print(key, value)
-    rowIndex += 1
-
-# def action():
-#      alert = "SURF ALERT\nBuoy 46088 (Port Angeles)\n" + Buoy.tos()
-#      send(alert)
- 
-# schedule.every(10).minutes.do(action)
- 
 # while True:
-#     schedule.run_pending()
+    # schedule.run_pending()
