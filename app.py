@@ -3,6 +3,13 @@ from bs4 import BeautifulSoup
 import time
 import schedule
 import smtplib
+import requests
+
+# Get data from NDBC
+url = 'https://www.ndbc.noaa.gov/data/realtime2/46267.txt'
+r = requests.get(url)
+data = r.text
+print(data)
 
 # Declare text carriers
 carriers = {
@@ -84,7 +91,7 @@ while rowIndex < len(rows):
         key = item[1].string
         value = item[2].string
 
-        print(key, value)
+        # print(key, value)
 
         # # Almost works...
         # while i < len(keywords):
