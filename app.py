@@ -33,10 +33,10 @@ class Buoy:
 # Create message function
 def send(message):
     # Send message to to_number from gmail address
-    to_number = ###
+    to_number = '3603019197{}'.format(carriers['googlefi'])
 
     # Gmail account and password
-    auth = ###
+    auth = ('straitsurf@gmail.com', 'LibTech1')
 
 	# Establish a secure session with gmail's outgoing SMTP server using your gmail account
     server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -84,20 +84,22 @@ while rowIndex < len(rows):
         key = item[1].string
         value = item[2].string
 
+        print(key, value)
+
         # # Almost works...
-        while i < len(keywords):
-            if keywords[i] in key:
-                setattr(Buoy, keywords[i], (key + value))
-                print(bcolors.OKGREEN + key, value + bcolors.ENDC)
-            else:
-                print(key, value)
+        # while i < len(keywords):
+        #     if keywords[i] in key:
+        #         setattr(Buoy, keywords[i], (key + value))
+        #         print(bcolors.OKGREEN + key, value + bcolors.ENDC)
+        #     else:
+        #         print(key, value)
     rowIndex += 1
 
-def action():
-     alert = "SURF ALERT\nBuoy 46088 (Port Angeles)\n" + Buoy.tos()
-     send(alert)
+# def action():
+#      alert = "SURF ALERT\nBuoy 46088 (Port Angeles)\n" + Buoy.tos()
+#      send(alert)
  
-schedule.every(10).minutes.do(action)
+# schedule.every(10).minutes.do(action)
  
-while True:
-    schedule.run_pending()
+# while True:
+#     schedule.run_pending()
