@@ -29,7 +29,7 @@ def getLatestDataFromRequests():
 # Create message function
 def send(message):
     # Send message to to_number from gmail address
-    to_number = '3603019197{}'.format(carriers['googlefi'])
+    to_number = f"3603019197{carriers['googlefi']}"
 
     # Gmail account and password
     auth = ('straitsurf@gmail.com', 'ubxdboegmwesflzg')
@@ -63,7 +63,8 @@ def checkSwell():
 
 checkSwell()
 
-# schedule.every(30).minutes.do(checkSwell)
+schedule.every(5).minutes.do(checkSwell)
 
-# while True:
-    # schedule.run_pending()
+while True:
+    schedule.run_pending()
+    time.sleep(1)
