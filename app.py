@@ -63,7 +63,7 @@ def checkSwell():
 
 checkSwell()
 
-schedule.every(5).minutes.do(checkSwell)
+schedule.every(30).minutes.do(checkSwell)
 
 while True:
     schedule.run_pending()
