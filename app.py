@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import time
 import schedule
-# import smtplib
 import requests
 from notifier import send
 
